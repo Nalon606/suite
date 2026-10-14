@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Osirius Suite</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-subtle: #f8f8f8;
+    --fg: #111111;
+    --muted: #767676;
+    --border: #eaeaea;
+    --card-bg: rgba(255, 255, 255, 0.78);
+    --card-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    --accent-ok: #10b981;
+    --wave-fill: #111111;
+    --dot-color: rgba(17, 17, 17, 0.07);
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0a0a0c;
+    --bg-subtle: #121216;
+    --fg: #f4f4f6;
+    --muted: #888892;
+    --border: #1f1f26;
+    --card-bg: rgba(18, 18, 22, 0.75);
+    --card-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --wave-fill: #f4f4f6;
+    --dot-color: rgba(255, 255, 255, 0.06);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.45s var(--ease), color 0.45s var(--ease);
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  header {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='%23111111' stroke='%23ffffff' stroke-width='2'/></svg>") 16 16, pointer;
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+    animation: slideDown 0.8s var(--ease) both;
+    position: relative;
+    z-index: 10;
+    user-select: none;
+  }
+
+  header:hover {
+    background-color: var(--bg-subtle);
+  }
+
+  .brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--accent-ok);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+    animation: pulseDot 2.5s infinite;
+  }
+
+  .brand {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .theme-pill {
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+  }
+
+  header:hover .theme-pill {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+
+  /* Main Container */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px 34vh;
+    position: relative;
+    z-index: 2;
+    animation: fadeUp 0.9s var(--ease) 0.15s both;
+  }
+
+  /* Vault Card */
+  .vault-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 28px;
+    padding: 40px 32px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 28px;
+    transition: background-color 0.45s var(--ease), box-shadow 0.45s var(--ease);
+  }
+
+  .vault-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .vault-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+  }
+
+  .vault-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    opacity: 0.85;
+  }
+
+  /* Output Display Stage */
+  .output-stage {
+    position: relative;
+    width: 100%;
+    min-height: 136px;
+    display: flex;
+     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    padding: 20px;
+    overflow: hidden;
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease);
+  }
+
+  .output-stage.active-password {
+    border-color: var(--fg);
+  }
+
+  /* Countdown Ring SVG */
+  .ring-container {
+    position: absolute;
+    width: 108px;
+    height: 108px;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+  }
+
+  .ring-container.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .progress-ring {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+  }
+
+  .progress-ring__track {
+    fill: transparent;
+    stroke: var(--border);
+    stroke-width: 2.5;
+  }
+
+  .progress-ring__bar {
+    fill: transparent;
+    stroke: var(--fg);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 301.59; /* 2 * PI * 48 */
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s var(--ease);
+  }
+
+  /* Display Number / Code */
+  #display {
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: 0.14em;
+    padding-left: 0.14em; /* optically center letter-spacing */
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+    user-select: none;
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+    transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), color 0.3s var(--ease);
+    z-index: 2;
+  }
+
+  #display.placeholder {
+    opacity: 0.25;
+    transform: translateY(0) scale(1);
+    font-size: 36px;
+    letter-spacing: 0.25em;
+    padding-left: 0.25em;
+  }
+
+  #display.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  #display.countdown {
+    font-size: 40px;
+    font-weight: 400;
+    letter-spacing: 0;
+    padding-left: 0;
+    color: var(--fg);
+  }
+
+  #display.password {
+    user-select: all;
+    -webkit-user-select: all;
+    cursor: pointer;
+    font-size: 56px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    padding-left: 0.16em;
+    color: var(--fg);
+  }
+
+  .copy-hint {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-top: 8px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+
+  .copy-hint.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Action Buttons */
+  .actions {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+  }
+
+  button.primary-btn {
+    flex: 1;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 16px 28px;
+    border: 1px solid var(--fg);
+    border-radius: 999px;
+    background: var(--fg);
+    color: var(--bg);
+    cursor: pointer;
+    transition: transform 0.3s var(--ease), background-color 0.3s var(--ease),
+                color 0.3s var(--ease), opacity 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+
+  button.primary-btn:hover:not(:disabled) {
+    background: transparent;
+    color: var(--fg);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.18);
+  }
+
+  button.primary-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+
+  button.primary-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  button.icon-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    color: var(--fg);
+    cursor: pointer;
+    transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), background-color 0.3s var(--ease);
+  }
+
+  button.icon-btn.visible {
+    display: inline-flex;
+    animation: popIn 0.35s var(--ease-out-back) both;
+  }
+
+  button.icon-btn:hover {
+    border-color: var(--fg);
+    transform: translateY(-2px);
+  }
+
+  button.icon-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed;
+    top: 88px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-16px) scale(0.95);
+    background: var(--fg);
+    color: var(--bg);
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  /* Waves */
+  .waves {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 36vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .wave {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 200%;
+    height: 100%;
+    display: block;
+    fill: var(--wave-fill);
+    transition: fill 0.45s var(--ease);
+  }
+
+  .w1 { opacity: 0.08; animation: drift 24s linear infinite; }
+  .w2 { opacity: 0.22; animation: drift 17s linear infinite reverse; }
+  .w3 { opacity: 0.78; animation: drift 12s linear infinite; }
+
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.75); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes pulseDot {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+    70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 18px 20px; }
+    .vault-card { padding: 32px 22px; border-radius: 24px; }
+    #display.password { font-size: 46px; }
+    .header-meta span:first-child { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Copied to clipboard</div>
+
+  <div class="waves" aria-hidden="true">
+    <svg class="wave w1" viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0,140 C90,100 270,100 360,140 C450,180 630,180 720,140 C810,100 990,100 1080,140 C1170,180 1350,180 1440,140 C1530,100 1710,100 1800,140 C1890,180 2070,180 2160,140 C2250,100 2430,100 2520,140 C2610,180 2790,180 2880,140 L2880,320 L0,320 Z"/></svg>
+    <svg class="wave w2" viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0,190 C90,150 270,150 360,190 C450,230 630,230 720,190 C810,150 990,150 1080,190 C1170,230 1350,230 1440,190 C1530,150 1710,150 1800,190 C1890,230 2070,230 2160,190 C2250,150 2430,150 2520,190 C2610,230 2790,230 2880,190 L2880,320 L0,320 Z"/></svg>
+    <svg class="wave w3" viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0,240 C90,200 270,200 360,240 C450,280 630,280 720,240 C810,200 990,200 1080,240 C1170,280 1350,280 1440,240 C1530,200 1710,200 1800,240 C1890,280 2070,280 2160,240 C2250,200 2430,200 2520,240 C2610,280 2790,280 2880,240 L2880,320 L0,320 Z"/></svg>
+  </div>
+
+  <header id="themeToggle" title="Click header to switch theme" role="button" tabindex="0" aria-label="Toggle color theme">
+    <div class="brand-wrap">
+      <span class="status-dot" aria-hidden="true"></span>
+      <div class="brand">Osirius Suite</div>
+    </div>
+    <div class="header-meta">
+      <span>Vault Ready</span>
+      <span class="theme-pill" id="themeLabel">Light</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="vault-card" aria-labelledby="vaultHeading">
+      <div class="vault-header">
+        <h1 class="vault-title" id="vaultHeading">Access Credential</h1>
+        <p class="vault-subtitle" id="statusText">Request a temporary session passcode</p>
+      </div>
+
+      <div class="output-stage" id="outputStage" aria-live="polite">
+        <div class="ring-container" id="ringContainer" aria-hidden="true">
+          <svg class="progress-ring" viewBox="0 0 108 108">
+            <circle class="progress-ring__track" cx="54" cy="54" r="48" />
+            <circle class="progress-ring__bar" id="progressBar" cx="54" cy="54" r="48" />
+          </svg>
+        </div>
+
+        <div id="display" class="placeholder">••••</div>
+        <div class="copy-hint" id="copyHint">Click code to copy</div>
+      </div>
+
+      <div class="actions">
+        <button id="getPassword" class="primary-btn" type="button">Get password</button>
+        <button id="copyBtn" class="icon-btn" type="button" aria-label="Copy password to clipboard" title="Copy password">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+<script>
+  (function () {
+    const PASSWORD = "6767";
+    const COUNTDOWN_SECONDS = 5;
+    const CIRCUMFERENCE = 2 * Math.PI * 48; // r=48
+
+    const htmlEl = document.documentElement;
+    const themeToggle = document.getElementById("themeToggle");
+    const themeLabel = document.getElementById("themeLabel");
+    const button = document.getElementById("getPassword");
+    const copyBtn = document.getElementById("copyBtn");
+    const display = document.getElementById("display");
+    const outputStage = document.getElementById("outputStage");
+    const ringContainer = document.getElementById("ringContainer");
+    const progressBar = document.getElementById("progressBar");
+    const statusText = document.getElementById("statusText");
+    const copyHint = document.getElementById("copyHint");
+    const toast = document.getElementById("toast");
+
+    let timerId = null;
+    let scrambleId = null;
+    let toastTimeout = null;
+
+    // Initialize Theme
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const savedTheme = localStorage.getItem("osirius-theme") || (prefersDark ? "dark" : "light");
+    applyTheme(savedTheme);
+
+    function applyTheme(theme) {
+      htmlEl.setAttribute("data-theme", theme);
+      themeLabel.textContent = theme === "dark" ? "Dark" : "Light";
+      localStorage.setItem("osirius-theme", theme);
+    }
+
+    function toggleTheme() {
+      const current = htmlEl.getAttribute("data-theme");
+      applyTheme(current === "dark" ? "light" : "dark");
+    }
+
+    themeToggle.addEventListener("click", toggleTheme);
+    themeToggle.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleTheme();
+      }
+    });
+
+    // Display & Ring Helpers
+    function setRingProgress(fraction) {
+      const offset = CIRCUMFERENCE * (1 - fraction);
+      progressBar.style.strokeDashoffset = String(offset);
+    }
+
+    function setDisplay(text, className) {
+      display.textContent = text;
+      display.className = "";
+      requestAnimationFrame(() => {
+        display.classList.add("show", className);
+      });
+    }
+
+    function selectPassword() {
+      const range = document.createRange();
+      range.selectNodeContents(display);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    async function copyPassword() {
+      if (!display.classList.contains("password")) return;
+      selectPassword();
+      try {
+        await navigator.clipboard.writeText(PASSWORD);
+        showToast("Passcode 6767 copied to clipboard");
+      } catch {
+        showToast("Passcode selected — press Ctrl+C");
+      }
+    }
+
+    // Cryptographic Scramble Reveal
+    function revealPasswordWithScramble() {
+      ringContainer.classList.remove("visible");
+      outputStage.classList.add("active-password");
+      statusText.textContent = "Passcode decrypted and ready";
+
+      const chars = "0123456789";
+      let ticks = 0;
+      const maxTicks = 10;
+
+      display.className = "show password";
+
+      scrambleId = setInterval(() => {
+        ticks += 1;
+        if (ticks < maxTicks) {
+          let randomStr = "";
+          for (let i = 0; i < PASSWORD.length; i++) {
+            randomStr += chars[Math.floor(Math.random() * chars.length)];
+          }
+          display.textContent = randomStr;
+        } else {
+          clearInterval(scrambleId);
+          scrambleId = null;
+          display.textContent = PASSWORD;
+          button.disabled = false;
+          button.textContent = "Regenerate";
+          copyBtn.classList.add("visible");
+          copyHint.classList.add("visible");
+          selectPassword();
+        }
+      }, 38);
+    }
+
+    function startCountdown() {
+      if (timerId !== null || scrambleId !== null) return;
+
+      button.disabled = true;
+      button.textContent = "Decrypting...";
+      copyBtn.classList.remove("visible");
+      copyHint.classList.remove("visible");
+      outputStage.classList.remove("active-password");
+      statusText.textContent = "Synchronizing security token...";
+
+      let remaining = COUNTDOWN_SECONDS;
+
+      // Reset Ring
+      progressBar.style.transition = "none";
+      setRingProgress(1);
+      ringContainer.classList.add("visible");
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          progressBar.style.transition = "stroke-dashoffset 1s linear";
+          setRingProgress((remaining - 1) / COUNTDOWN_SECONDS);
+        });
+      });
+
+      setDisplay(String(remaining), "countdown");
+
+      timerId = setInterval(() => {
+        remaining -= 1;
+
+        if (remaining > 0) {
+          setDisplay(String(remaining), "countdown");
+          setRingProgress((remaining - 1) / COUNTDOWN_SECONDS);
+        } else {
+          clearInterval(timerId);
+          timerId = null;
+          revealPasswordWithScramble();
+        }
+      }, 1000);
+    }
+
+    button.addEventListener("click", startCountdown);
+    copyBtn.addEventListener("click", copyPassword);
+    display.addEventListener("click", copyPassword);
+  })();
+</script>
+
+</body>
+</html>
